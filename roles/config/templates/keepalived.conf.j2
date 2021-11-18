@@ -1,0 +1,43 @@
+{% if inventory_hostname == master %}
+{% set unicast_src_ip = master %}
+{% set unicast_peer = slave %}
+{% set priority = 110 %}
+{% endif %}
+
+{% if inventory_hostname == slave %}
+{% set unicast_src_ip = slave %}
+{% set unicast_peer = master %}
+{% set priority = 100 %}
+{% endif %}
+
+global_defs {
+  router_id nginx
+}
+
+vrrp_script check_nginx {
+  script "/bin/check_nginx.sh"
+  interval 2
+  weight 50
+}
+
+vrrp_instance VI_01 {
+  state MASTER
+  interface eth0
+  virtual_router_id 151
+  priority {{ priority }}
+
+unicast_src_ip {{ unicast_src_ip }}
+    unicast_peer {
+        {{ unicast_peer }}
+   }
+  virtual_ipaddress {
+    {{ vip }}
+  }
+  track_script {
+    check_nginx
+  }
+  authentication {
+    auth_type PASS
+    auth_pass secret
+  }
+}

@@ -1,0 +1,12 @@
+- name: Update and Upgrade OS
+  apt: update_cache=yes
+
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: latest
+
+- name: Install keepalived
+  apt:
+    name: keepalived
+    state: latest
